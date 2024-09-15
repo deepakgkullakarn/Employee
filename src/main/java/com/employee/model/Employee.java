@@ -12,16 +12,13 @@ import java.time.LocalDate;
 public class Employee {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-
     private String fname;
     private String lname;
-    private String emailId;
+    private String email_id;
     private String department;
-
-    private LocalDate employment_Start_Date;
-
+    private LocalDate employment_start_date;
     private LocalDate employment_end_date;
 
 }

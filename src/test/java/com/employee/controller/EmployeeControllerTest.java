@@ -15,9 +15,12 @@ import org.springframework.http.ResponseEntity;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.employee.constants.EmployeeConst.*;
+import static com.employee.constants.EmployeeConst.EMPL_DEPT_DIGITAL;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
@@ -44,7 +47,9 @@ public class EmployeeControllerTest {
     @Test
     public void testgetexportUsersToExcel() throws IOException {
         ByteArrayOutputStream byteArrayopStream = new ByteArrayOutputStream();
-        when(excelExportService.exportAllUsersToExcel()).thenReturn(new ByteArrayInputStream(byteArrayopStream.toByteArray()));
+        LocalDate yeardate = LocalDate.of(EMPL_START_YEAR, EMPL_START_MONTH, EMPL_START_DAY);
+        String department =EMPL_DEPT_DIGITAL;
+        when(excelExportService.exportEmployeeDetails(department,yeardate)).thenReturn(new ByteArrayInputStream(byteArrayopStream.toByteArray()));
         ResponseEntity<InputStreamResource> response=employeeController.exportUsersToExcel();
         assertNotNull(response);
 

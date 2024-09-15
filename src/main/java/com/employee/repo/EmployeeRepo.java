@@ -6,9 +6,12 @@ import org.springframework.data.jpa.repository.Query;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * This Employee Repo interface for performing CRUD operation on Employee table.
+ */
 public interface EmployeeRepo extends JpaRepository<Employee, Long> {
 
-    @Query(value = "SELECT * FROM EMPLOYEE u WHERE u.DEPARTMENT = 'Digital' and u.employment_start_date > :year", nativeQuery = true)
-    public List<Employee> findAllEmployeeToExport(LocalDate year);
+    @Query(value = "SELECT * FROM EMPLOYEE u WHERE u.DEPARTMENT = :dept and u.employment_start_date > :yeardate", nativeQuery = true)
+    public List<Employee> findAllEmployeeToExport(String dept, LocalDate yeardate);
 
 }

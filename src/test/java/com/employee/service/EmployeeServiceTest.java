@@ -51,7 +51,7 @@ public class EmployeeServiceTest {
         emp.setFname("Test");
         emp.setLname("Testing");
         emp.setDepartment("Digital");
-        emp.setEmployment_Start_Date(LocalDate.of(2023,12,31));
+        emp.setEmployment_start_date(LocalDate.of(2023,12,31));
         emp.setEmployment_end_date(LocalDate.of(2025,12,31));
         when(employeeRepository.save(emp)).thenReturn(new Employee());
         Employee saverespon=employeeService.saveEmployee(emp);

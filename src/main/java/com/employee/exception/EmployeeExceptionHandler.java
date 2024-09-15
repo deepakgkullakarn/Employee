@@ -11,10 +11,10 @@ import java.util.Map;
 @ControllerAdvice
 public class EmployeeExceptionHandler {
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<Object> handleException(Exception ex) {
+    @ExceptionHandler(EmployeeRelievedException.class)
+    public ResponseEntity<Object> handleEmplRelievedException(EmployeeRelievedException ex) {
         Map<String, Object> body = new HashMap<>();
-        body.put("message", "An error occurred");
+        body.put("message", "Employee has left the Organization");
         return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

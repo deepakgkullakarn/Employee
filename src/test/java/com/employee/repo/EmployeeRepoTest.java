@@ -26,9 +26,9 @@ public class EmployeeRepoTest {
     {
         employee.setFname("John");
         employee.setLname("Doe");
-        employee.setEmailId("john.doe@example.com");
+        employee.setEmail_id("john.doe@example.com");
         employee.setDepartment("john.doe@example.com");
-        employee.setEmployment_Start_Date(LocalDate.of(2023,12,31));
+        employee.setEmployment_start_date(LocalDate.of(2023,12,31));
         employee.setEmployment_end_date(LocalDate.of(2024,12,31));
     }
 
