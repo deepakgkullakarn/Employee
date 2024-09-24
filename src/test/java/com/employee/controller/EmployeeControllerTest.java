@@ -3,6 +3,7 @@ package com.employee.controller;
 import com.employee.model.Employee;
 import com.employee.service.EmployeeHelperService;
 import com.employee.service.EmployeeService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +12,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -19,7 +19,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.time.LocalDate;
 import java.util.List;
-
 
 import static com.employee.constants.EmployeeConst.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -178,18 +177,22 @@ public class EmployeeControllerTest {
     }
 
     @Test
-    public void testcreateEmployee() throws Exception {
-        Long id = 5L;
+    public void testcreateEmployeeExcpt() throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
         Employee empl = new Employee();
-        empl.setId(id);
+        empl.setId(5L);
         empl.setFname("Peter");
         empl.setLname("sam");
         empl.setDepartment("Data");
         empl.setEmail_id("peterd@test.com");
-        empl.setEmployment_start_date(LocalDate.of(2018, 01, 01));
+        empl.setEmployment_start_date(null);
         empl.setEmployment_end_date(null);
-        ResponseEntity<Employee> response = employeeController.createEmployee(empl);
-        assertNotNull(response);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/employees")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(empl))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isInternalServerError());
     }
 
     @Test
