@@ -7,8 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDate;
@@ -34,8 +32,6 @@ public class EmployeeServiceTest {
         when(employeeRepository.findAll()).thenReturn(lsempl);
         List<Employee> emplresponse= employeeService.getAllEmployees();
         assertNotNull(emplresponse);
-
-
     }
 
     @Test

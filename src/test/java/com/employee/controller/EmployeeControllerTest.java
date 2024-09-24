@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +17,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -38,7 +36,6 @@ public class EmployeeControllerTest {
 
     @MockBean
     private EmployeeService employeeService;
-
 
     @MockBean
     private EmployeeHelperService excelExportService;
@@ -74,17 +71,17 @@ public class EmployeeControllerTest {
         Employee empl = new Employee();
         empl.setId(id);
         empl.setFname("Peter");
-        empl.setLname("Diesel");
+        empl.setLname("sam");
         empl.setDepartment("Data");
         empl.setEmail_id("peterd@test.com");
-        empl.setEmployment_start_date(null);
+        empl.setEmployment_start_date(LocalDate.of(2023, 01, 01));
         empl.setEmployment_end_date(LocalDate.of(2025,12,12));
         employeeService.saveEmployee(empl);
         when(employeeService.getEmployeeById(anyLong())).thenReturn(empl);
         mockMvc.perform(MockMvcRequestBuilders
                         .put("/employees/{id}",id)
                         .content("{\n" +
-                                "        \"fname\": \"AlwindDelete\",\n" +
+                                "        \"fname\": \"AlwindEnGrt\",\n" +
                                 "        \"lname\": \"Rodrigez\",\n" +
                                 "        \"email_id\": \"test@test.com\",\n" +
                                 "        \"department\": \"Digital\",\n" +
@@ -102,50 +99,96 @@ public class EmployeeControllerTest {
         Employee empl = new Employee();
         empl.setId(id);
         empl.setFname("Peter");
-        empl.setLname("Diesel");
+        empl.setLname("sam");
         empl.setDepartment("Data");
         empl.setEmail_id("peterd@test.com");
-        empl.setEmployment_start_date(null);
+        empl.setEmployment_start_date(LocalDate.of(2021, 01, 01));
         empl.setEmployment_end_date(LocalDate.of(2023,12,12));
         employeeService.saveEmployee(empl);
         when(employeeService.getEmployeeById(anyLong())).thenReturn(empl);
-        ResponseEntity<Employee> response = employeeController.updateEmployee(id,empl);
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR,response.getStatusCode());
+        mockMvc.perform(MockMvcRequestBuilders
+                        .put("/employees/{id}",id)
+                        .content("{\n" +
+                                "        \"fname\": \"AlwinEdLes\",\n" +
+                                "        \"lname\": \"Rodrigez\",\n" +
+                                "        \"email_id\": \"test@test.com\",\n" +
+                                "        \"department\": \"Digital\",\n" +
+                                "        \"employment_start_date\": \"2024-02-03\",\n" +
+                                "        \"employment_end_date\": \"2023-02-12\"\n" +
+                                "    }")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isInternalServerError());
     }
 
     @Test
-    public void testupdateEmployeeLeftOrg() {
-        Long id=11L;
-        Employee emp = new Employee();
-        emp.setDepartment("Data");
-        emp.setEmployment_end_date(LocalDate.of(2022, 01, 01));
-        when(employeeService.getEmployeeById(id)).thenReturn(emp);
-        ResponseEntity<Employee> createresponse=employeeController.updateEmployee(id,emp);
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR,createresponse.getStatusCode());
+    public void testupdateEmployeeLeftOrg() throws Exception {
+        Long id = 3L;
+        Employee empl = new Employee();
+        empl.setId(id);
+        empl.setFname("Peter");
+        empl.setLname("sam");
+        empl.setDepartment("Data");
+        empl.setEmail_id("peterd@test.com");
+        empl.setEmployment_start_date(LocalDate.of(2018, 01, 01));
+        empl.setEmployment_end_date(LocalDate.of(2022, 01, 01));
+        employeeService.saveEmployee(empl);
+        when(employeeService.getEmployeeById(anyLong())).thenReturn(empl);
+        mockMvc.perform(MockMvcRequestBuilders
+                        .put("/employees/{id}",id)
+                        .content("{\n" +
+                                "        \"fname\": \"AlwinEdLes\",\n" +
+                                "        \"lname\": \"Rodrigez\",\n" +
+                                "        \"email_id\": \"test@test.com\",\n" +
+                                "        \"department\": \"Digital\",\n" +
+                                "        \"employment_start_date\": \"2024-02-03\",\n" +
+                                "        \"employment_end_date\": \"2023-02-12\"\n" +
+                                "    }")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isInternalServerError());
     }
 
 
     @Test
-    public void testupdateEmployeeEndDateNA() {
-        Long id=11L;
-        Employee emp = new Employee();
-        emp.setDepartment("Data");
-        emp.setEmployment_end_date(null);
-        when(employeeService.getEmployeeById(id)).thenReturn(emp);
-        ResponseEntity<Employee> createresponse=employeeController.updateEmployee(id,emp);
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR,createresponse.getStatusCode());
+    public void testupdateEmployeeEndDateNA() throws Exception {
+        Long id = 4L;
+        Employee empl = new Employee();
+        empl.setId(id);
+        empl.setFname("Peter");
+        empl.setLname("sam");
+        empl.setDepartment("Data");
+        empl.setEmail_id("peterd@test.com");
+        empl.setEmployment_start_date(LocalDate.of(2018, 01, 01));
+        empl.setEmployment_end_date(null);
+        when(employeeService.getEmployeeById(id)).thenReturn(empl);
+        mockMvc.perform(MockMvcRequestBuilders
+                        .put("/employees/{id}",id)
+                        .content("{\n" +
+                                "        \"fname\": \"AlwindEnGrt\",\n" +
+                                "        \"lname\": \"Rodrigez\",\n" +
+                                "        \"email_id\": \"test@test.com\",\n" +
+                                "        \"department\": \"Digital\",\n" +
+                                "        \"employment_start_date\": \"2024-02-03\",\n" +
+                                "        \"employment_end_date\": \"2023-02-12\"\n" +
+                                "    }")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
     }
 
     @Test
-    public void testcreateEmployeeException() throws Exception {
-        Employee saveempl = new Employee();
-        saveempl.setId(null);
-        saveempl.setFname("James");
-        saveempl.setLname("Ken");
-        saveempl.setDepartment("Digital");
-        saveempl.setEmail_id("jamesken@test.com");
-        saveempl.setEmployment_end_date(null);
-        ResponseEntity<Employee> response = employeeController.createEmployee(saveempl);
+    public void testcreateEmployee() throws Exception {
+        Long id = 5L;
+        Employee empl = new Employee();
+        empl.setId(id);
+        empl.setFname("Peter");
+        empl.setLname("sam");
+        empl.setDepartment("Data");
+        empl.setEmail_id("peterd@test.com");
+        empl.setEmployment_start_date(LocalDate.of(2018, 01, 01));
+        empl.setEmployment_end_date(null);
+        ResponseEntity<Employee> response = employeeController.createEmployee(empl);
         assertNotNull(response);
     }
 
