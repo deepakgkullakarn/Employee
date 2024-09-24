@@ -1,8 +1,6 @@
 package com.employee.controller;
 
-
 import com.employee.exception.EmployeeExportException;
-import com.employee.exception.EmployeeRelievedException;
 import com.employee.exception.NoSuchEmployeeExistsException;
 import com.employee.model.Employee;
 import com.employee.service.EmployeeHelperService;
@@ -13,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -22,14 +19,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
 
 import static com.employee.constants.EmployeeConst.*;
-
 
 /**
  * This Employee controller class to perform CRUD operations on the Employee table.
@@ -76,12 +70,7 @@ public class EmployeeController {
                     .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
                     .body(new InputStreamResource(in));
         }
-        catch (EmployeeExportException e){
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-        catch (IOException e){
-            e.printStackTrace();
+         catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -112,7 +101,6 @@ public class EmployeeController {
             return ResponseEntity.of(Optional.of(empl));
         }
         catch (Exception e){
-            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -130,29 +118,34 @@ public class EmployeeController {
                 Employee empl_existing= employeeService.getEmployeeById(id);
                 LocalDate emplEndDate = empl_existing.getEmployment_end_date();
                 logger.info("emplEndDate :"+emplEndDate);
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");
-                Date emplendDatedb = sdf.parse(emplEndDate.toString());
-            logger.info("emplendDatedb :"+emplendDatedb);
-            String currentDatestr = sdf.format(new Date());
-                Date currentdate = sdf.parse(currentDatestr);
-                logger.info("currentdateparse :"+currentdate);
-
-
-                if(emplEndDate == null || emplendDatedb.compareTo(currentdate) > 0){
+                if(emplEndDate != null ){
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");
+                    Date emplendDatedb = sdf.parse(emplEndDate.toString());
+                    logger.info("emplendDatedb :"+emplendDatedb);
+                    String currentDatestr = sdf.format(new Date());
+                    Date currentdate = sdf.parse(currentDatestr);
+                    logger.info("currentdateparse :"+currentdate);
+                    if(emplendDatedb.compareTo(currentdate) > 0) {
+                        employee.setId(id);
+                        Employee updateEmpl = employeeService.saveEmployee(employee);
+                        return ResponseEntity.ok().body(updateEmpl);
+                    }
+                    else{
+                        logger.info("Employee -" +id+" left the Organization");
+                        return ResponseEntity
+                                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                .body("Employee has left the Organization");
+                    }
+                    }
+                else {
                     employee.setId(id);
                     Employee updateEmpl = employeeService.saveEmployee(employee);
                     return ResponseEntity.ok().body(updateEmpl);
-                    }
-                else{
-                    logger.info("Employee -" +id+" left the Organization");
-                    return ResponseEntity
-                            .status(HttpStatus.FORBIDDEN)
-                            .body("Employee has left the Organization");
+
                 }
 
         }
         catch (Exception e){
-            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -170,7 +163,6 @@ public class EmployeeController {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
         catch (Exception e){
-            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

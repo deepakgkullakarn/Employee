@@ -1,0 +1,279 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > EmployeeController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.employee.controller</a>
+</div>
+
+<h1>Coverage Summary for Class: EmployeeController (com.employee.controller)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EmployeeController</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    37.5%
+  </span>
+  <span class="absValue">
+    (3/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    4.3%
+  </span>
+  <span class="absValue">
+    (3/70)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.employee.controller;
+&nbsp;
+&nbsp;import com.employee.exception.EmployeeExportException;
+&nbsp;import com.employee.exception.NoSuchEmployeeExistsException;
+&nbsp;import com.employee.model.Employee;
+&nbsp;import com.employee.service.EmployeeHelperService;
+&nbsp;import com.employee.service.EmployeeService;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;
+&nbsp;import org.springframework.core.io.InputStreamResource;
+&nbsp;import org.springframework.http.HttpHeaders;
+&nbsp;import org.springframework.http.HttpStatus;
+&nbsp;import org.springframework.http.MediaType;
+&nbsp;import org.springframework.http.ResponseEntity;
+&nbsp;import org.springframework.web.bind.annotation.*;
+&nbsp;
+&nbsp;import java.io.ByteArrayInputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.text.SimpleDateFormat;
+&nbsp;import java.time.LocalDate;
+&nbsp;import java.util.*;
+&nbsp;
+&nbsp;import static com.employee.constants.EmployeeConst.*;
+&nbsp;
+&nbsp;/**
+&nbsp; * This Employee controller class to perform CRUD operations on the Employee table.
+&nbsp; */
+&nbsp;@RestController
+&nbsp;@RequestMapping(&quot;/employees&quot;)
+<b class="fc">&nbsp;public class EmployeeController {</b>
+<b class="fc">&nbsp;    private static final Logger logger = LoggerFactory.getLogger(EmployeeController.class);</b>
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    private EmployeeService employeeService;
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    private EmployeeHelperService excelExportService;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get details of Employee.
+&nbsp;     * @return List of Employee
+&nbsp;     */
+&nbsp;    @GetMapping
+&nbsp;    public ResponseEntity&lt;List&lt;Employee&gt;&gt; getAllEmployees() {
+<b class="nc">&nbsp;        logger.info(&quot;Begin Get All Employee details&quot;);</b>
+<b class="nc">&nbsp;        List&lt;Employee&gt; lsempl= employeeService.getAllEmployees();</b>
+<b class="nc">&nbsp;        return ResponseEntity.of(Optional.of(lsempl));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * To download employee details as XLS.
+&nbsp;     * @return input streamResource for XL download
+&nbsp;     */
+&nbsp;    @GetMapping(&quot;/export&quot;)
+&nbsp;    public ResponseEntity&lt;InputStreamResource&gt; exportUsersToExcel() {
+<b class="nc">&nbsp;        logger.info(&quot;Begin Export&quot;);</b>
+<b class="nc">&nbsp;        LocalDate specific_yeardate = LocalDate.of(EMPL_START_YEAR, EMPL_START_MONTH, EMPL_START_DAY);</b>
+<b class="nc">&nbsp;        String specific_department =EMPL_DEPT_DIGITAL;</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            ByteArrayInputStream in = excelExportService.exportEmployeeDetails(specific_department,specific_yeardate);</b>
+<b class="nc">&nbsp;            HttpHeaders headers = new HttpHeaders();</b>
+<b class="nc">&nbsp;            headers.add(&quot;Content-Disposition&quot;, &quot;attachment; filename=users.xlsx&quot;);</b>
+<b class="nc">&nbsp;            logger.info(&quot;Preparing Response Entity&quot;);</b>
+&nbsp;            return ResponseEntity
+<b class="nc">&nbsp;                    .ok()</b>
+<b class="nc">&nbsp;                    .headers(headers)</b>
+<b class="nc">&nbsp;                    .contentType(MediaType.parseMediaType(&quot;application/vnd.ms-excel&quot;))</b>
+<b class="nc">&nbsp;                    .body(new InputStreamResource(in));</b>
+&nbsp;        }
+<b class="nc">&nbsp;         catch (IOException e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get Employee details with a specific Id.
+&nbsp;     * @param id
+&nbsp;     * @return Employee
+&nbsp;     */
+&nbsp;    @GetMapping(&quot;/{id}&quot;)
+&nbsp;    public Employee getEmployeeById(@PathVariable Long id) {
+<b class="nc">&nbsp;        logger.info(&quot;Getting Employee details for&quot;+id);</b>
+<b class="nc">&nbsp;        Employee empl =employeeService.getEmployeeById(id);</b>
+<b class="nc">&nbsp;        Optional.ofNullable(empl).orElseThrow(() -&gt; new NoSuchEmployeeExistsException(HttpStatus.NOT_FOUND,&quot;Employee does not exist&quot;));</b>
+<b class="nc">&nbsp;        return empl;</b>
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;</b>
+&nbsp;    /**
+&nbsp;     * Create Employee details.
+&nbsp;     * @param employee
+&nbsp;     * @return Employee
+&nbsp;     */
+&nbsp;    @PostMapping
+&nbsp;    public ResponseEntity&lt;Employee&gt; createEmployee(@RequestBody Employee employee) {
+<b class="nc">&nbsp;        logger.info(&quot;Begin createEmployee&quot;);</b>
+&nbsp;        try{
+<b class="nc">&nbsp;            Employee empl = employeeService.saveEmployee(employee);</b>
+<b class="nc">&nbsp;            return ResponseEntity.of(Optional.of(empl));</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        catch (Exception e){</b>
+<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Update Employee details.
+&nbsp;     * @param id
+&nbsp;     * @param employee
+&nbsp;     * @return Employee
+&nbsp;     */
+&nbsp;    @PutMapping(&quot;/{id}&quot;)
+&nbsp;    public ResponseEntity updateEmployee(@PathVariable Long id, @RequestBody Employee employee) {
+<b class="nc">&nbsp;        logger.info(&quot;Begin updateEmployee&quot;);</b>
+&nbsp;        try{
+<b class="nc">&nbsp;                Employee empl_existing= employeeService.getEmployeeById(id);</b>
+<b class="nc">&nbsp;                LocalDate emplEndDate = empl_existing.getEmployment_end_date();</b>
+<b class="nc">&nbsp;                logger.info(&quot;emplEndDate :&quot;+emplEndDate);</b>
+<b class="nc">&nbsp;                SimpleDateFormat sdf = new SimpleDateFormat(&quot;yyyy-mm-dd&quot;);</b>
+<b class="nc">&nbsp;                Date emplendDatedb = sdf.parse(emplEndDate.toString());</b>
+<b class="nc">&nbsp;                logger.info(&quot;emplendDatedb :&quot;+emplendDatedb);</b>
+<b class="nc">&nbsp;                String currentDatestr = sdf.format(new Date());</b>
+<b class="nc">&nbsp;                Date currentdate = sdf.parse(currentDatestr);</b>
+<b class="nc">&nbsp;                logger.info(&quot;currentdateparse :&quot;+currentdate);</b>
+<b class="nc">&nbsp;</b>
+<b class="nc">&nbsp;</b>
+<b class="nc">&nbsp;                if(emplEndDate == null || emplendDatedb.compareTo(currentdate) &gt; 0){</b>
+<b class="nc">&nbsp;                    employee.setId(id);</b>
+<b class="nc">&nbsp;                    Employee updateEmpl = employeeService.saveEmployee(employee);</b>
+<b class="nc">&nbsp;                    return ResponseEntity.ok().body(updateEmpl);</b>
+<b class="nc">&nbsp;                    }</b>
+<b class="nc">&nbsp;                else{</b>
+<b class="nc">&nbsp;                    logger.info(&quot;Employee -&quot; +id+&quot; left the Organization&quot;);</b>
+<b class="nc">&nbsp;                    return ResponseEntity</b>
+<b class="nc">&nbsp;                            .status(HttpStatus.INTERNAL_SERVER_ERROR)</b>
+<b class="nc">&nbsp;                            .body(&quot;Employee has left the Organization&quot;);</b>
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        catch (Exception e){</b>
+<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;
+&nbsp;        /**
+&nbsp;     * Delete Employee details.
+&nbsp;     * @param id
+&nbsp;     */
+&nbsp;    @DeleteMapping(&quot;/{id}&quot;)
+&nbsp;    public ResponseEntity&lt;?&gt; deleteEmployee(@PathVariable Long id) {
+<b class="nc">&nbsp;        logger.info(&quot;Begin deleteEmployee&quot;);</b>
+&nbsp;        try{
+<b class="nc">&nbsp;            employeeService.deleteEmployee(id);</b>
+<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        catch (Exception e){</b>
+<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();</b>
+<b class="fc">&nbsp;        }</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-09-23 19:35</div>
+</div>
+</body>
+</html>
